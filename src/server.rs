@@ -318,8 +318,7 @@ impl Server {
     /// Removes all the mocks stored on the server.
     ///
     pub fn reset(&mut self) {
-        let state = self.state.clone();
-        let mut state = state.write().unwrap();
+        let mut state = self.state.write().unwrap();
         state.mocks.clear();
         state.unmatched_requests.clear();
     }
@@ -329,8 +328,7 @@ impl Server {
     ///
     #[deprecated(since = "1.0.1", note = "Use `Server::reset` instead")]
     pub async fn reset_async(&mut self) {
-        let state = self.state.clone();
-        let mut state = state.write().unwrap();
+        let mut state = self.state.write().unwrap();
         state.mocks.clear();
         state.unmatched_requests.clear();
     }
@@ -356,8 +354,7 @@ async fn handle_request(
     request.read_body().await;
     log::debug!("Request received: {}", request.formatted());
 
-    let mutex = state.clone();
-    let mut state = mutex.write().unwrap();
+    let mut state = state.write().unwrap();
     let mut matching_mocks: Vec<&mut RemoteMock> = vec![];
 
     for mock in state.mocks.iter_mut() {

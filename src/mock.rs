@@ -440,8 +440,7 @@ impl Mock {
     ///
     #[track_caller]
     pub fn assert(&self) {
-        let mutex = self.state.clone();
-        let state = mutex.read().unwrap();
+        let state = self.state.read().unwrap();
         if let Some(hits) = state.get_mock_hits(self.inner.id.clone()) {
             let matched = self.matched_hits(hits);
             let message = if !matched {
@@ -461,8 +460,7 @@ impl Mock {
     /// Same as `Mock::assert` but async.
     ///
     pub async fn assert_async(&self) {
-        let mutex = self.state.clone();
-        let state = mutex.read().unwrap();
+        let state = self.state.read().unwrap();
         if let Some(hits) = state.get_mock_hits(self.inner.id.clone()) {
             let matched = self.matched_hits(hits);
             let message = if !matched {
@@ -482,8 +480,7 @@ impl Mock {
     /// Returns whether the expected amount of requests (defaults to 1) were performed.
     ///
     pub fn matched(&self) -> bool {
-        let mutex = self.state.clone();
-        let state = mutex.read().unwrap();
+        let state = self.state.read().unwrap();
         let Some(hits) = state.get_mock_hits(self.inner.id.clone()) else {
             return false;
         };
@@ -495,8 +492,7 @@ impl Mock {
     /// Same as `Mock::matched` but async.
     ///
     pub async fn matched_async(&self) -> bool {
-        let mutex = self.state.clone();
-        let state = mutex.read().unwrap();
+        let state = self.state.read().unwrap();
         let Some(hits) = state.get_mock_hits(self.inner.id.clone()) else {
             return false;
         };
@@ -544,8 +540,7 @@ impl Mock {
     /// Removes the mock from the server.
     ///
     pub fn remove(&self) {
-        let mutex = self.state.clone();
-        let mut state = mutex.write().unwrap();
+        let mut state = self.state.write().unwrap();
         state.remove_mock(self.inner.id.clone());
     }
 
@@ -553,8 +548,7 @@ impl Mock {
     /// Same as `Mock::remove` but async.
     ///
     pub async fn remove_async(&self) {
-        let mutex = self.state.clone();
-        let mut state = mutex.write().unwrap();
+        let mut state = self.state.write().unwrap();
         state.remove_mock(self.inner.id.clone());
     }
 

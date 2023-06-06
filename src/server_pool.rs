@@ -84,8 +84,7 @@ impl ServerPool {
             None
         };
 
-        let state_mutex = self.state.clone();
-        let mut state = state_mutex.lock().unwrap();
+        let mut state = self.state.lock().unwrap();
 
         if let Some(server) = server {
             state.push_back(server);
@@ -100,8 +99,7 @@ impl ServerPool {
 
     fn recycle(&self, mut server: Server) {
         server.reset();
-        let state_mutex = self.state.clone();
-        let mut state = state_mutex.lock().unwrap();
+        let mut state = self.state.lock().unwrap();
         state.push_back(server);
     }
 }
