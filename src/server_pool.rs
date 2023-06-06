@@ -52,23 +52,15 @@ impl Drop for ServerGuard {
 }
 
 pub(crate) struct ServerPool {
-    max_size: usize,
-    created: usize,
     semaphore: Semaphore,
     state: Arc<Mutex<VecDeque<Server>>>,
 }
 
 impl ServerPool {
     fn new(max_size: usize) -> ServerPool {
-        let created = 0;
         let semaphore = Semaphore::new(max_size);
         let state = Arc::new(Mutex::new(VecDeque::new()));
-        ServerPool {
-            max_size,
-            created,
-            semaphore,
-            state,
-        }
+        ServerPool { semaphore, state }
     }
 
     pub(crate) async fn get_async(&'static self) -> Result<ServerGuard, Error> {
@@ -78,21 +70,15 @@ impl ServerPool {
             .await
             .map_err(|err| Error::new_with_context(ErrorKind::Deadlock, err))?;
 
-        let server = if self.created < self.max_size {
-            Some(Server::try_new_with_port_async(0).await?)
-        } else {
-            None
-        };
+        let server = Server::try_new_with_port_async(0).await?;
 
         let mut state = self.state.lock().unwrap();
-
-        if let Some(server) = server {
-            state.push_back(server);
-        }
+        state.push_back(server);
 
         if let Some(server) = state.pop_front() {
             Ok(ServerGuard::new(server, permit))
         } else {
+            // can't happen, we just unconditionally pushed a new server
             Err(Error::new(ErrorKind::ServerBusy))
         }
     }
